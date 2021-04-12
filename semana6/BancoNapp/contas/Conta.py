@@ -11,6 +11,7 @@ class Conta:
             ValueError: Caso o saldo seja menor ou igual a zero.
         """
         self.extrato = []
+        self.profissao = kwargs.get('profissao', '')
         self.limite = kwargs.get('limite', 500)
         self.nome = kwargs.get('nome', None)
         self.saldo = 0
@@ -19,3 +20,58 @@ class Conta:
             raise ValueError('Saldo negativo')
         self.saldo = saldo
         self.extrato.append(('I', saldo))
+
+    def deposito(self, valor):
+        """
+        Método para realizar depósito.
+        Este método suporta somente números maiores que zero.
+
+        Args:
+            valor (float ou int): Valor positivo do depósito
+
+        Raises:
+            ValueError: Erro ocorre quando é informado valor negativo.
+            TypeError: Quando o tipo passado não for inteiro ou float.
+        """
+        if isinstance(valor, (float, int)):
+            if valor <= 0:
+                raise ValueError('Valor do depósito precisa ser maior que zero')
+            self.saldo = self.saldo + valor
+            self.extrato.append(('D', valor))
+            return
+        raise TypeError('O depósito precisa ser numérico')
+
+    def saque(self, valor):
+        """
+        Método para realizar saque.
+        Este método suporta somente números maiores que zero.
+
+        Args:
+            valor (float ou int): Valor positivo do saque
+
+        Raises:
+            ValueError: Erro ocorre quando é informado valor negativo.
+            TypeError: Quando o tipo passado não for inteiro ou float.
+
+        Returns:
+            Float: Valor do saque realizado.
+        """
+        if isinstance(valor, (float, int)):
+            if self.limite == 0 and valor > self.saldo:
+                raise ValueError('Valor do saque supera seu saldo.')
+            if valor > (self.saldo + self.limite):
+                raise ValueError('Valor do saque supera seu saldo e seu limite')
+
+            self.saldo = self.saldo - valor
+            self.extrato.append(('S', valor))
+            return valor
+        raise TypeError('O valor do saque precisa ser numérico')
+
+    def get_extrato(self):
+        """
+        Retorna a lista dos saques e depósitos feitos na conta.
+
+        Returns:
+            List: Lista de operações
+        """
+        return self.extrato
